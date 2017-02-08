@@ -1,6 +1,10 @@
+#define ACTION constants
 SELECT = 1
 UP = 2
 DOWN = 3
 RIGHT = 4
 LEFT = 5
 MOD = 6
+ATTACK = 7
+JUMP = 8
+MENU = 9

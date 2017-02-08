@@ -53,6 +53,47 @@ class EventParserTestCase(unittest.TestCase):
             #assert
             self.assertEqual([], result, msg="Returned action list is not empty for keys: {} and {}".format(pair[0], pair[1]))
 
+    def test_unassigned_keys_perform_no_action(self):
+        """Do unassigned keys add no actions to the list?"""
+        mappings = [K_p,
+                    K_0,
+                    K_m,
+                    K_ESCAPE,
+                    K_SEMICOLON,
+                    K_F10]
+
+        for key in mappings:
+            #arrange
+            keymap = self.initialize_blank_keymap()
+            keymap[key] = 1
+
+            #act
+            result = ep.parse_keymap(keymap)
+
+            #assert
+            self.assertEqual([], result, msg="Key {} returned action when it should not have.".format(key))
+
+    def test_random_keymaps(self):
+        """Are 'random' keyaps parsed into the correct actions?"""
+        mappings = {(UP, RIGHT):[K_UP, K_RIGHT],
+                    (LEFT,):[K_LEFT, K_g, K_y],
+                    (MOD, DOWN, RIGHT):[K_LSHIFT, K_DOWN, K_RIGHT, K_l],
+                    (UP,):[K_UP, K_LEFT, K_RIGHT]}
+
+        #loop over all mappings in the dictionary
+        for actions, inputs in mappings.items():
+            keymap = self.initialize_blank_keymap()
+
+            #arrange
+            for keypress in inputs:
+                keymap[keypress] = 1
+
+            #act
+            result = ep.parse_keymap(keymap)
+
+            #assert
+            self.assertEqual(list(actions), result, msg="Keymap did not produce expected result for mapping {}".format(str(inputs)))
+
 
     def initialize_blank_keymap(self):
         return [0]*323
