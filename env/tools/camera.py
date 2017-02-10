@@ -62,7 +62,7 @@ class ScrollingCamera(Camera):
         self.scroller = pyscroll.group.PyscrollGroup(map_layer=self._renderer, default_layer=self.player_layer)
 
     def draw(self, surface, position):
-        assert type(position) is tuple, "Position must be tuple"
+        assert type(position) is list, "Position must be list"
         self._update(position)
         self.scroller.draw(surface)
         pass
@@ -79,3 +79,9 @@ class ScrollingCamera(Camera):
     #TODO
     def scale(self, new_size):
         pass
+
+    def add(self, surface):
+        self.scroller.add(surface)
+
+    def update(self):
+        self.scroller.update()
