@@ -65,11 +65,9 @@ class ScrollingCamera(Camera):
         assert type(position) is list, "Position must be list"
         self._update(position)
         self.scroller.draw(surface)
-        pass
 
     def _update(self, position):
         self.scroller.center(position)
-        pass
     
     def set_screensize(self, new_size):
         assert type(new_size) is tuple, "Screensize must be a tuple" 

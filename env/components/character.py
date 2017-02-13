@@ -3,8 +3,6 @@ import pygame.sprite
 import pyganim
 from actions import *
 
-MOVEMENT_SPEED = 9
-
 class OverworldCharacter(pygame.sprite.Sprite):
     """
     OVERWORLD CHARACTER
@@ -31,6 +29,9 @@ class OverworldCharacter(pygame.sprite.Sprite):
     
     default_image - the image that will be displayed when 'current_animation' is None
 
+    direction - the direction that the sprite is currently facing
+
+    !! nedded to crete an animated sprite
     animation_dictionary - dictionary to explain which frames correspond to a given action
                            frames should be listed in the order that they are to be played
 
@@ -40,23 +41,26 @@ class OverworldCharacter(pygame.sprite.Sprite):
                                  'LEFT':[10, 11, 12, 13],
                                  'RIGHT':[14, 15, 16, 17]}
 
-    current_animation - the animation that is currently playing --  set to None to display 'default_image' 
+    display_time - the amount of time each frame in an animation should be displayed for
 
-    direction - the direction that the sprite is currently facing
+    current_action - the animation that is currently playing --  set to None to display 'default_image' 
+
     """
     def __init__(self, sprite_sheet, position, num_rows=1, num_cols=1,
                     default_image=0, animation_dictionary=None, display_time=100,
-                    direction=DOWN, current_action=None):
+                    direction=DOWN, current_action=None, movement_speed=5, run_modifier=1.5):
 
         pygame.sprite.Sprite.__init__(self)
 
         self.position = position
+        self.movement_speed = movement_speed
+        self.run_modifier = run_modifier
 
         #split the spritesheet into a list of individual images
         self._images = pyganim.getImagesFromSpriteSheet(sprite_sheet, rows=num_rows, cols=num_cols)
 
         #set the character to show the default image
-        #if num_cols or num_rows is not supplied, _images will only be a pygame Surface, not a list
+        #if num_cols or num_rows is not supplied, _images will only be a single pygame Surface, not a list
         if type(self._images) is list:
             self.image = self._images[default_image]
             self.is_animated = True
@@ -70,9 +74,9 @@ class OverworldCharacter(pygame.sprite.Sprite):
 
         #take the animation dictionary and convert it to Pyganim animations for each action
         if(animation_dictionary):
-            self.animations = self.build_animations(animation_dictionary, display_time)
+            self.animations = self._build_animations(animation_dictionary, display_time)
             self._move_conductor = pyganim.PygConductor(self.animations)
-                
+  
     #update the postion of the character.  updates the animation frame if necessary
     def update(self):
         if self.current_action and self.is_animated:
@@ -80,42 +84,57 @@ class OverworldCharacter(pygame.sprite.Sprite):
 
         self.rect.topleft = self.position
 
-    #methods to handle character movement and set animation flags
-    def moveup(self):
-        self.position[1] -= MOVEMENT_SPEED
-        if self.current_action == None:
-            self.current_action = UP
-            self.direction = UP
-
-    def movedown(self):
-        self.position[1] += MOVEMENT_SPEED
-        if self.current_action == None:
-            self.current_action = DOWN
-            self.direction = DOWN
-
-    def moveleft(self):
-        self.position[0] -= MOVEMENT_SPEED
-        self.current_action = LEFT
-        self.direction = LEFT
-
-    def moveright(self):
-        self.position[0] += MOVEMENT_SPEED
-        self.current_action = RIGHT
-        self.direction = RIGHT
-
     def _update_animation(self):
+        assert self.is_animated, "Character must be animated in order to call this method"
         temp = pygame.Surface((self.image.get_width(), self.image.get_height()), pygame.SRCALPHA, 32)
         temp.convert_alpha()
 
         self.animations[self.current_action].blit(temp, (0,0))
         self.image = temp
         
-    def pause(self):
+    #figure out which way the sprite should be facing
+    def _set_direction(self, directions):
+        assert self.is_animated, "Character must be animated in order to call this method"
+        if LEFT in directions or RIGHT in directions:
+            self.direction = list((set([LEFT, RIGHT]) & set(directions)))[0] 
+        else:
+            self.direction = list((set([UP, DOWN]) & set(directions)))[0]
+
+        self.current_action = self.direction
+
+    #called by the action handler to update the position and direction of the sprite
+    def move(self, directions, run=False):
+        assert self.is_animated, "Character must be animated in order to call this method"
+        self._move_conductor.play()
+
+        speed = self.movement_speed
+        if run:
+            speed = int(speed * self.run_modifier)
+
+        for direction in directions:
+            if direction == UP:
+                self.position[1] -= speed
+            elif direction == DOWN:
+                self.position[1] += speed
+            elif direction == RIGHT:
+                self.position[0] += speed
+            elif direction == LEFT:
+                self.position[0] -= speed
+
+        self._set_direction(directions)
+
+    #called by the action handler if no actions are to be performed
+    def default(self):
+        assert self.is_animated, "Character must be animated in order to call this method"
         self._move_conductor.pause()
         self.current_action = None
 
-    def play(self):
-        self._move_conductor.play()
+        temp = pygame.Surface((self.image.get_width(), self.image.get_height()), pygame.SRCALPHA, 32)
+        temp.convert_alpha()
+
+        temp.blit(self.animations[self.direction].getFrame(0), (0,0))
+        self.image = temp
+
 
     """
     Build a dictionary of actions and pyganim animations
@@ -130,7 +149,7 @@ class OverworldCharacter(pygame.sprite.Sprite):
          RIGHT:<walk right animation>}
 
     """
-    def build_animations(self, animation_dictionary, display_time):
+    def _build_animations(self, animation_dictionary, display_time):
         assert type(animation_dictionary) is dict, "Animation dictionary must be a dictionary {key=Action:value=[List of images]}"
         animations = {}
 
@@ -138,9 +157,6 @@ class OverworldCharacter(pygame.sprite.Sprite):
             images = []
             for image in image_list:
                 images.append(self._images[image])
-
-                if image == self.image:
-                    self.current_action = DOWN
 
             display_times = [display_time]*len(images)
 

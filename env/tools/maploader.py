@@ -1,3 +1,4 @@
+import pygame
 from pytmx.util_pygame import load_pygame
 
 class MapLoader(object):
@@ -12,10 +13,8 @@ class MapLoader(object):
     height - height of last loaded map in pixels
     width - width of last loaded map in pixels
     """
-    def __init__(self):
-        self.filename = None
-        self.height = 0
-        self.width = 0
+    def __init__(self, filename):
+        self.load_map(filename)
 
     def __repr__(self):
         return "<MapLoader>\nFilename: {}\n{} x {}".format(self.filename, self.width, self.height)
@@ -30,7 +29,24 @@ class MapLoader(object):
         """
         assert filename.endswith('.tmx'), "Map file must be .tmx formatted."
         self.filename = filename
-        result = load_pygame(filename)
-        self.height = result.height * result.tileheight
-        self.width = result.width * result.tilewidth
-        return result
+        self.mapfile = load_pygame(filename)
+        self.height = self.mapfile.height * self.mapfile.tileheight
+        self.width = self.mapfile.width * self.mapfile.tilewidth
+        self.blockers = self._build_blockers()
+
+    def _build_blockers(self):
+        """
+        Read the metadata of the map file and produce a list of pygame.Rect objects to represent blockers on the map.
+
+        Used to check for collisions.
+        """
+        blockers = []
+        
+        for object in self.mapfile.objects:
+            properties = object.__dict__
+            position = pygame.Rect(object.x, object.y, object.width, object.height)
+
+            if properties['name'] == 'blocker':
+                blockers.append(position)
+
+        return blockers
