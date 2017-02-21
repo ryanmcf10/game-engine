@@ -3,6 +3,18 @@ import pygame.sprite
 import pyganim
 from actions import *
 
+class Character():
+    """
+    CHARCTER
+
+    The main representation of a character
+
+    The Character contains metadata/state, and is composed of specific representations of a character for different game environments.
+    
+    """
+    def __init__(self):
+        pass
+
 class OverworldCharacter(pygame.sprite.Sprite):
     """
     OVERWORLD CHARACTER
@@ -44,8 +56,8 @@ class OverworldCharacter(pygame.sprite.Sprite):
     display_time - the amount of time each frame in an animation should be displayed for
 
     current_action - the animation that is currently playing --  set to None to display 'default_image' 
-
     """
+
     def __init__(self, sprite_sheet, position, num_rows=1, num_cols=1,
                     default_image=0, animation_dictionary=None, display_time=100,
                     direction=DOWN, current_action=None, movement_speed=5, run_modifier=1.5):
@@ -53,6 +65,7 @@ class OverworldCharacter(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.position = position
+        self.last_position = position
         self.movement_speed = movement_speed
         self.run_modifier = run_modifier
 
@@ -70,7 +83,13 @@ class OverworldCharacter(pygame.sprite.Sprite):
 
         self.current_action = current_action
         self.direction = direction
+        
+        #used for drawing the sprite
         self.rect = self.image.get_rect()
+        self.rect.topleft = self.position
+        #used to check for collisions
+        self.collision_rect = pygame.Rect(0, 0, self.rect.width * .5, 8)
+        self.collision_rect.midbottom = self.rect.midbottom
 
         #take the animation dictionary and convert it to Pyganim animations for each action
         if(animation_dictionary):
@@ -82,8 +101,7 @@ class OverworldCharacter(pygame.sprite.Sprite):
         if self.current_action and self.is_animated:
             self._update_animation() 
 
-        self.rect.topleft = self.position
-
+    #set the character to display the next frame of the animation
     def _update_animation(self):
         assert self.is_animated, "Character must be animated in order to call this method"
         temp = pygame.Surface((self.image.get_width(), self.image.get_height()), pygame.SRCALPHA, 32)
@@ -102,13 +120,16 @@ class OverworldCharacter(pygame.sprite.Sprite):
 
         self.current_action = self.direction
 
-    #called by the action handler to update the position and direction of the sprite
-    def move(self, directions, run=False):
-        assert self.is_animated, "Character must be animated in order to call this method"
+    #move the position of the sprite in the specified directions
+    def move(self, directions, is_running=False):
         self._move_conductor.play()
+        self._set_direction(directions)
+
+        self.last_position = self.position[:]
 
         speed = self.movement_speed
-        if run:
+
+        if is_running:
             speed = int(speed * self.run_modifier)
 
         for direction in directions:
@@ -116,15 +137,22 @@ class OverworldCharacter(pygame.sprite.Sprite):
                 self.position[1] -= speed
             elif direction == DOWN:
                 self.position[1] += speed
-            elif direction == RIGHT:
-                self.position[0] += speed
             elif direction == LEFT:
                 self.position[0] -= speed
+            elif direction == RIGHT:
+                self.position[0] += speed
 
-        self._set_direction(directions)
+        self.rect.topleft = self.position
+        self.collision_rect.midbottom = self.rect.midbottom
+
+    #undo the last move
+    def move_back(self):
+        self.position = self.last_position[:]
+        self.rect.topleft = self.position
+        self.collision_rect.midbottom = self.rect.midbottom
 
     #called by the action handler if no actions are to be performed
-    def default(self):
+    def pause(self):
         assert self.is_animated, "Character must be animated in order to call this method"
         self._move_conductor.pause()
         self.current_action = None
@@ -135,6 +163,10 @@ class OverworldCharacter(pygame.sprite.Sprite):
         temp.blit(self.animations[self.direction].getFrame(0), (0,0))
         self.image = temp
 
+    #check if the character is colliding with any rects in the blockers list
+    def is_collision(self, blockers):
+        assert type(blockers) is list, "Blockers must be a list of pygame.Rect objects"
+        return self.collision_rect.collidelist(blockers) != -1
 
     """
     Build a dictionary of actions and pyganim animations

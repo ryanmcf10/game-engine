@@ -21,6 +21,9 @@ def handle_character_movement(actions, character, blockers):
 
     if len(actions) > 0:
         character.move(actions, run=is_running)
+        if _is_character_colliding_with_blockers(blockers, character):
+            print('COLLISION')
+            character.moveback()
 
     else:
         character.default()
