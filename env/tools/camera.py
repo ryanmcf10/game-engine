@@ -83,3 +83,6 @@ class ScrollingCamera(Camera):
 
     def update(self):
         self.scroller.update()
+
+    def add_grid(self, grid):
+        self.scroller.add(grid, layer=10)

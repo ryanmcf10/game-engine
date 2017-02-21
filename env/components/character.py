@@ -68,6 +68,7 @@ class OverworldCharacter(pygame.sprite.Sprite):
         self.last_position = position
         self.movement_speed = movement_speed
         self.run_modifier = run_modifier
+        self.is_moving = False
 
         #split the spritesheet into a list of individual images
         self._images = pyganim.getImagesFromSpriteSheet(sprite_sheet, rows=num_rows, cols=num_cols)

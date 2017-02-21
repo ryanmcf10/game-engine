@@ -9,15 +9,17 @@ def main():
     pygame.init()
     DISPLAYSURF = pygame.display.set_mode((400, 300), RESIZABLE)
     CLOCK = pygame.time.Clock()
-    pygame.display.set_caption("TEST")
+    pygame.display.set_caption("PATH TEST")
     
-    environment = overworld.Overworld('tests/maps/map1.tmx') 
-    environment.add_player()
+    environment = overworld.Overworld('tests/maps/map1.tmx', debug=True) 
+    
 
     actions = []
 
     while True:
-        environment.update(DISPLAYSURF, actions)
+        mouse_pos = list(pygame.mouse.get_pos())
+        environment.debug_update(DISPLAYSURF, actions, mouse_pos)
+
         pygame.display.flip()
 
         actions = ep.parse_keymap(pygame.key.get_pressed())
