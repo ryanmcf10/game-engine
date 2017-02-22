@@ -10,9 +10,9 @@ from actions import *
 
 class Overworld(environmentabc.Environment):
     def __init__(self, filename, debug=False):
-        self.map = maploader.MapLoader(filename)
+        self.map = maploader.load_map_tmx(filename)
 
-        self.view = camera.ScrollingCamera(self.map.mapfile, screensize=(400,300)) 
+        self.view = camera.ScrollingCamera(self.map.map_data, screensize=(400,300)) 
 
         self.add_player()
         self.position = [300, 150]
@@ -26,10 +26,8 @@ class Overworld(environmentabc.Environment):
         self.view.update()
         self.view.draw(surface, position)
 
-        blocks = self.map.blockers
+        self.handler.execute(actions, self.map.blockers)
 
-        self.handler.execute(actions, blocks)
-        
     def scale(self):
         pass
 
@@ -76,15 +74,13 @@ class Overworld(environmentabc.Environment):
     def debug_update(self, surface, actions, mouse_pos):
         self._calc_position(mouse_pos)
 
-        self.grid.highlight_cell(tuple(self.position))
-
         self.view.update()
         self.view.draw(surface, self.position)
         blocks = self.map.blockers
         self.handler.execute(actions, blocks)
 
     def _show_grid(self):
-        self.grid = Grid(self.map.width, self.map.height, self.map.mapfile.width, self.map.mapfile.height)
+        self.grid = self.map.grid
 
         self.view.add_grid(self.grid)
 

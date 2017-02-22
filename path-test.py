@@ -2,6 +2,8 @@ import pygame, sys
 import eventparser as ep
 import env.overworld as overworld
 
+from colors import *
+
 from pygame.locals import *
 from actions import *
 
@@ -32,6 +34,8 @@ def main():
                 environment.scale()
                 #TODO: make this rescale the map instead of expanding display area
                 DISPLAYSURF = pygame.display.set_mode((event.w, event.h), RESIZABLE)
+            elif event.type == MOUSEBUTTONDOWN:
+                environment.grid.set_color(random_color())
 
         CLOCK.tick(30)
 
