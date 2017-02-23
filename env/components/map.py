@@ -32,5 +32,12 @@ class Map():
 
             if properties['name'] == 'blocker':
                 self.blockers.append(blocker)
-                
-                self.grid.set_cell_value(self.grid.get_cell_at_point(blocker.center), 1)
+
+                print("OBJECT ID: {}".format(str(properties['id'])))
+                 
+                #self.grid.set_cell_value(self.grid.get_cell_at_point(blocker.center), 1)
+                cells = self.grid.get_cells_in_rect(blocker)
+
+                for cell in cells:
+                    self.grid.set_cell_value(cell, 1)
+

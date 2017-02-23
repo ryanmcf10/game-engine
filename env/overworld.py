@@ -10,6 +10,8 @@ from actions import *
 
 class Overworld(environmentabc.Environment):
     def __init__(self, filename, debug=False):
+        self.debug = debug
+
         self.map = maploader.load_map_tmx(filename)
 
         self.view = camera.ScrollingCamera(self.map.map_data, screensize=(400,300)) 
@@ -17,7 +19,7 @@ class Overworld(environmentabc.Environment):
         self.add_player()
         self.position = [300, 150]
 
-        if debug:
+        if self.debug:
             self._show_grid()
 
     def update(self, surface, actions):
@@ -39,7 +41,7 @@ class Overworld(environmentabc.Environment):
 
         self.player = character.OverworldCharacter('./tests/characters/sprites/male_sprite_model.png', position=[300,150],
                                                     num_rows=4, num_cols=8, default_image=10, animation_dictionary=anim_dict,
-                                                    display_time=100) 
+                                                    display_time=100, debug=self.debug)
 
         self.view.add(self.player)
         self.handler = actionhandler.PlayerActionHandler(self.player)
@@ -81,6 +83,4 @@ class Overworld(environmentabc.Environment):
 
     def _show_grid(self):
         self.grid = self.map.grid
-
         self.view.add_grid(self.grid)
-

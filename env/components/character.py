@@ -60,7 +60,8 @@ class OverworldCharacter(pygame.sprite.Sprite):
 
     def __init__(self, sprite_sheet, position, num_rows=1, num_cols=1,
                     default_image=0, animation_dictionary=None, display_time=100,
-                    direction=DOWN, current_action=None, movement_speed=5, run_modifier=1.5):
+                    direction=DOWN, current_action=None, movement_speed=5, run_modifier=1.5,
+                    debug=False):
 
         pygame.sprite.Sprite.__init__(self)
 
@@ -96,6 +97,8 @@ class OverworldCharacter(pygame.sprite.Sprite):
         if(animation_dictionary):
             self.animations = self._build_animations(animation_dictionary, display_time)
             self._move_conductor = pyganim.PygConductor(self.animations)
+
+        self.debug = debug
   
     #update the postion of the character.  updates the animation frame if necessary
     def update(self):
@@ -108,7 +111,23 @@ class OverworldCharacter(pygame.sprite.Sprite):
         temp = pygame.Surface((self.image.get_width(), self.image.get_height()), pygame.SRCALPHA, 32)
         temp.convert_alpha()
 
-        self.animations[self.current_action].blit(temp, (0,0))
+        #set the sprites image
+
+        if self.debug:
+            #fill the sprite with transparent green
+            temp.fill((0,255,0,128))
+
+            self.animations[self.current_action].blit(temp, (0,0))
+
+            #display the collision rect in transparent red
+            collision_rect = pygame.Surface((self.collision_rect.width, self.collision_rect.height), pygame.SRCALPHA)
+            collision_rect.convert_alpha()
+            collision_rect.fill((255,0,0,128))
+            temp.blit(collision_rect, (8,56))
+
+        else:
+            self.animations[self.current_action].blit(temp, (0,0))
+
         self.image = temp
         
     #figure out which way the sprite should be facing
@@ -161,13 +180,30 @@ class OverworldCharacter(pygame.sprite.Sprite):
         temp = pygame.Surface((self.image.get_width(), self.image.get_height()), pygame.SRCALPHA, 32)
         temp.convert_alpha()
 
-        temp.blit(self.animations[self.direction].getFrame(0), (0,0))
+
+        if self.debug:
+            #fill the sprite with tranparent green
+            temp.fill((0,255,0,128))
+
+            temp.blit(self.animations[self.direction].getFrame(0), (0,0))
+
+            #fill the collision rect with transparent red
+            collision_rect = pygame.Surface((self.collision_rect.width, self.collision_rect.height), pygame.SRCALPHA)
+            collision_rect.convert_alpha()
+            collision_rect.fill((255,0,0,128))
+            temp.blit(collision_rect, (8,56))
+
         self.image = temp
 
     #check if the character is colliding with any rects in the blockers list
     def is_collision(self, blockers):
         assert type(blockers) is list, "Blockers must be a list of pygame.Rect objects"
         return self.collision_rect.collidelist(blockers) != -1
+
+    def draw_collision_rect(self):
+        temp = pygame.Surface((self.collision_rect.width, self.collision_rect.height), pygame.SRCALPHA)
+        temp.fill((255,0,0))
+        self.image.blit(temp, self.collision_rect.topleft)
 
     """
     Build a dictionary of actions and pyganim animations

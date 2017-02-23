@@ -32,6 +32,9 @@ class Grid(pygame.sprite.Sprite):
         
         self.cell_width = width/num_cols
         self.cell_height = height/num_rows
+    
+        self.show_lines = True
+        self.show_cells = True
 
         self._init_grid_data()
 
@@ -61,13 +64,16 @@ class Grid(pygame.sprite.Sprite):
             for y in range(self.num_cols):
                 current_cell = self.grid_data[x][y]
 
-                if current_cell.value == 1:
-                    temp = pygame.Surface((self.cell_width, self.cell_height), pygame.SRCALPHA)
-                    temp.fill(GREEN)
-                    temp.set_alpha(128)
-                    grid_surface.blit(temp, (y*self.cell_width, x*self.cell_height))
+                if self.show_cells:
+                    if current_cell.value == 1:
+                        temp = pygame.Surface((self.cell_width, self.cell_height), pygame.SRCALPHA)
+                        temp.convert_alpha()
+                        temp.fill((255,0,0,128))
 
-                pygame.draw.rect(grid_surface, self.color, current_cell.rect, 1)
+                        grid_surface.blit(temp, (y*self.cell_width, x*self.cell_height))
+
+                if self.show_lines:
+                    pygame.draw.rect(grid_surface, self.color, current_cell.rect, 1)
 
         self.image = grid_surface
 
@@ -84,12 +90,25 @@ class Grid(pygame.sprite.Sprite):
     Set the cell to a value and set the update flag
 
     :param: cell - cell to update
-    :param: value - value to
+    :param: value - value to set cell to
     """
     def set_cell_value(self, cell, value):
         cell.value = value
         self.is_up_to_date = False
     
+
+    """
+    Set the value of all cells in a list and set the update flag
+
+    :param: cells - list of cells
+    :param" value - value to set cells to
+    """
+    def set_cell_values(self, cells, value):
+        assert type(cells) is list, "set_cell_value: parameter 'cells' must be of type list."
+        for cell in cells:
+            cell.value = value
+        self.is_up_to_date = False
+
     """
     Get the cell at a certain point on the map
 
@@ -127,7 +146,57 @@ class Grid(pygame.sprite.Sprite):
     def get_cells_in_rect(self, rect):
         result = []
 
+        x_start = rect.topleft[0]
+        y_start = rect.topleft[1]
+
+        x_end = rect.bottomright[0]
+        y_end = rect.bottomright[1]
+
+        starting_row = 0
+        starting_col = 0
+        ending_row = 0
+        ending_col = 0
+
+        for x in range(self.num_rows):
+            top = self.grid_data[x][0].rect.top
+            bottom = self.grid_data[x][0].rect.bottom
+
+            if y_start > top and y_start <= bottom:
+                starting_row = x
+
+                for y in range(self.num_cols):
+                    left = self.grid_data[x][y].rect.left
+                    right = self.grid_data[x][y].rect.right
+
+                    if x_start > left and x_start <= right:
+                        starting_col = y
+
+            if y_end > top and y_end <= bottom:
+                ending_row = x
+                
+                for y in range(self.num_cols):
+                    left = self.grid_data[x][y].rect.left
+                    right = self.grid_data[x][y].rect.right
+
+                    if x_end > left and x_end <= right:
+                        ending_col = y
+
+        print("Starting row: {}  Ending row: {}".format(starting_row, ending_row))
+        print("Starting col: {}  Ending col: {}".format(starting_col, ending_col))
+        for row in range(starting_row, ending_row+1):
+            current_row = self.grid_data[row+1]
+            for col in range(starting_col, ending_col):
+                result.append(current_row[col+1])
+
         return result
+
+    def toggle_lines(self):
+        self.show_lines = not self.show_lines
+        self.is_up_to_date = False
+
+    def toggle_cells(self):
+        self.show_cells = not self.show_cells
+        self.is_up_to_date = False
 
 """
 CELL

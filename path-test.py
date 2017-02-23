@@ -9,7 +9,7 @@ from actions import *
 
 def main():
     pygame.init()
-    DISPLAYSURF = pygame.display.set_mode((400, 300), RESIZABLE)
+    DISPLAYSURF = pygame.display.set_mode((400, 300))
     CLOCK = pygame.time.Clock()
     pygame.display.set_caption("PATH TEST")
     
@@ -30,12 +30,8 @@ def main():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == VIDEORESIZE:
-                environment.scale()
-                #TODO: make this rescale the map instead of expanding display area
-                DISPLAYSURF = pygame.display.set_mode((event.w, event.h), RESIZABLE)
             elif event.type == MOUSEBUTTONDOWN:
-                environment.grid.set_color(random_color())
+                environment.grid.toggle_cells()
 
         CLOCK.tick(30)
 
