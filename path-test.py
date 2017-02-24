@@ -13,7 +13,7 @@ def main():
     CLOCK = pygame.time.Clock()
     pygame.display.set_caption("PATH TEST")
     
-    environment = overworld.Overworld('tests/maps/map1.tmx', debug=True) 
+    environment = overworld.Overworld('tests/maps/test.tmx', debug=True) 
     
 
     actions = []

@@ -44,7 +44,7 @@ class Overworld(environmentabc.Environment):
                                                     display_time=100, debug=self.debug)
 
         self.view.add(self.player)
-        self.handler = actionhandler.PlayerActionHandler(self.player)
+        self.handler = actionhandler.PlayerActionHandler(self.player, self.map.grid)
 
     def _calc_mouse_vector(self, mouse_pos):
         center = [200, 150]

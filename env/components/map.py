@@ -16,7 +16,7 @@ class Map():
         self.map_data = map_data
 
         #surface containg grid outline for the map
-        self.grid = grid.Grid(width, height, num_cols, num_rows)
+        self.grid = grid.Grid(width, height, num_cols*2, num_rows*2)
 
         self._build_blockers()
 
@@ -33,11 +33,12 @@ class Map():
             if properties['name'] == 'blocker':
                 self.blockers.append(blocker)
 
-                print("OBJECT ID: {}".format(str(properties['id'])))
+                #print("\n================")
+                #print("OBJECT ID: {}".format(str(properties['id'])))
+                #print("================")
                  
                 #self.grid.set_cell_value(self.grid.get_cell_at_point(blocker.center), 1)
                 cells = self.grid.get_cells_in_rect(blocker)
 
                 for cell in cells:
                     self.grid.set_cell_value(cell, 1)
-

@@ -7,6 +7,13 @@ GRID
 A grid of Cells, used to represent the value of each tile on a map
 Used for path finding.
 
+
+Cell values have different meaning:
+
+0 -- empty/unoccupied
+1 -- generic blocker
+2 -- current player position
+
 =========
 INITIALIZATION PARAMETERS
 =========
@@ -65,7 +72,7 @@ class Grid(pygame.sprite.Sprite):
                 current_cell = self.grid_data[x][y]
 
                 if self.show_cells:
-                    if current_cell.value == 1:
+                    if current_cell.value != 0:
                         temp = pygame.Surface((self.cell_width, self.cell_height), pygame.SRCALPHA)
                         temp.convert_alpha()
                         temp.fill((255,0,0,128))
@@ -93,10 +100,10 @@ class Grid(pygame.sprite.Sprite):
     :param: value - value to set cell to
     """
     def set_cell_value(self, cell, value):
+        cell.last_value = cell.value
         cell.value = value
         self.is_up_to_date = False
     
-
     """
     Set the value of all cells in a list and set the update flag
 
@@ -104,8 +111,9 @@ class Grid(pygame.sprite.Sprite):
     :param" value - value to set cells to
     """
     def set_cell_values(self, cells, value):
-        assert type(cells) is list, "set_cell_value: parameter 'cells' must be of type list."
+        assert type(cells) is list, "set_cell_values: parameter 'cells' must be of type list."
         for cell in cells:
+            cell.last_value = cell.value
             cell.value = value
         self.is_up_to_date = False
 
@@ -152,6 +160,9 @@ class Grid(pygame.sprite.Sprite):
         x_end = rect.bottomright[0]
         y_end = rect.bottomright[1]
 
+        #print("Topleft: ({}, {})".format(str(x_start), str(y_start)))
+        #print("Bottomright: ({}, {})".format(str(x_end), str(y_start)))
+
         starting_row = 0
         starting_col = 0
         ending_row = 0
@@ -161,32 +172,33 @@ class Grid(pygame.sprite.Sprite):
             top = self.grid_data[x][0].rect.top
             bottom = self.grid_data[x][0].rect.bottom
 
-            if y_start > top and y_start <= bottom:
+            if y_start >= top and y_start < bottom:
                 starting_row = x
 
                 for y in range(self.num_cols):
                     left = self.grid_data[x][y].rect.left
                     right = self.grid_data[x][y].rect.right
 
-                    if x_start > left and x_start <= right:
+                    if x_start >= left and x_start < right:
                         starting_col = y
 
-            if y_end > top and y_end <= bottom:
+            if y_end >= top and y_end < bottom:
                 ending_row = x
                 
                 for y in range(self.num_cols):
                     left = self.grid_data[x][y].rect.left
                     right = self.grid_data[x][y].rect.right
 
-                    if x_end > left and x_end <= right:
+                    if x_end >= left and x_end < right:
                         ending_col = y
 
-        print("Starting row: {}  Ending row: {}".format(starting_row, ending_row))
-        print("Starting col: {}  Ending col: {}".format(starting_col, ending_col))
+        #print("Starting row: {}  Ending row: {}".format(starting_row, ending_row))
+        #print("Starting col: {}  Ending col: {}".format(starting_col, ending_col))
         for row in range(starting_row, ending_row+1):
-            current_row = self.grid_data[row+1]
-            for col in range(starting_col, ending_col):
-                result.append(current_row[col+1])
+            current_row = self.grid_data[row]
+            for col in range(starting_col, ending_col+1):
+                if current_row[col].rect.colliderect(rect):
+                    result.append(current_row[col])
 
         return result
 
@@ -208,6 +220,7 @@ Contains a value (int) and a pygame.Rect to hold its position
 class Cell():
     def __init__(self, value, rect, row, col):
         self.value = value
+        self.last_value = self.value
         self.row = row
         self.col = col
         self.rect = rect
