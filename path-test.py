@@ -30,8 +30,46 @@ def main():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == MOUSEBUTTONDOWN:
-                environment.grid.toggle_cells()
+            elif event.type == KEYDOWN:
+                #toggle grid settings
+                if event.key == K_1:
+                    environment.grid.toggle_grid()
+                elif event.key == K_2:
+                    environment.grid.toggle_lines()
+                elif event.key == K_3:
+                    environment.grid.toggle_cells()
+
+                #temporary -- set goal for pathfinding
+                elif event.key == K_k:
+                    current_cell = environment.grid.get_cell_at_grid_index(environment.goal)
+                    goal = list(environment.goal)
+                    goal[0] -= 1
+                    environment.goal = tuple(goal)
+                    environment.grid.set_cell_value(current_cell, current_cell.last_value)
+                    environment.grid.set_cell_value(environment.grid.get_cell_at_grid_index(goal), 2)
+                elif event.key == K_j:
+                    current_cell = environment.grid.get_cell_at_grid_index(environment.goal)
+                    goal = list(environment.goal)
+                    goal[0] += 1
+                    environment.goal = tuple(goal)
+                    environment.grid.set_cell_value(current_cell, current_cell.last_value)
+                    environment.grid.set_cell_value(environment.grid.get_cell_at_grid_index(goal), 2)
+                elif event.key == K_h:
+                    current_cell = environment.grid.get_cell_at_grid_index(environment.goal)
+                    goal = list(environment.goal)
+                    goal[1] -= 1
+                    environment.goal = tuple(goal)
+                    environment.grid.set_cell_value(current_cell, current_cell.last_value)
+                    environment.grid.set_cell_value(environment.grid.get_cell_at_grid_index(goal), 2)
+                elif event.key == K_l:
+                    current_cell = environment.grid.get_cell_at_grid_index(environment.goal)
+                    goal = list(environment.goal)
+                    goal[1] += 1
+                    environment.goal = tuple(goal)
+                    environment.grid.set_cell_value(current_cell, current_cell.last_value)
+                    environment.grid.set_cell_value(environment.grid.get_cell_at_grid_index(goal), 2)
+                elif event.key == K_SPACE:
+                    environment.handler.move_to(environment.goal)
 
         CLOCK.tick(30)
 

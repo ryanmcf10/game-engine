@@ -1,5 +1,6 @@
 from actions import *
 import env.components.character
+import env.tools.pathfinder as pf
 
 OPPOSITES = [[UP, DOWN],
              [LEFT, RIGHT]]
@@ -23,6 +24,9 @@ class PlayerActionHandler(object):
     def __init__(self, character, grid=None):
         self.character = character
         self.grid = grid
+
+        if grid is not None:
+            self.graph = pf.WeightedGraph(self.grid)
 
     def execute(self, actions, blockers):
         is_running = False
@@ -60,8 +64,16 @@ class PlayerActionHandler(object):
     def _move(self, directions, mod, blockers):
         self.character.move(directions, mod)
 
-        if self.character.is_collision(blockers):
+        if self.character.is_collision(blockers) or self.character.is_out_of_bounds(self.grid.width, self.grid.height):
             self.character.move_back()
+
+    def move_to(self, goal):
+        start = self.grid.get_cell_at_point(self.character.collision_rect.center).position
+        came_from, cost_so_far = pf.a_star_search(self.graph, start, goal)
+        print(pf.reconstruct_path(came_from, start, goal))
+        for index in pf.reconstruct_path(came_from, start, goal):
+            current_cell = self.grid.get_cell_at_grid_index(index)
+            self.grid.set_cell_value(current_cell, 3)
        
 class NpcActionHandler(object):
     def __init__(self, character):

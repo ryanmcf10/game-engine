@@ -72,10 +72,27 @@ class Grid(pygame.sprite.Sprite):
                 current_cell = self.grid_data[x][y]
 
                 if self.show_cells:
-                    if current_cell.value != 0:
+                    #highlight blockers in red
+                    if current_cell.value == 1:
                         temp = pygame.Surface((self.cell_width, self.cell_height), pygame.SRCALPHA)
                         temp.convert_alpha()
                         temp.fill((255,0,0,128))
+
+                        grid_surface.blit(temp, (y*self.cell_width, x*self.cell_height))
+
+                    #highlight goal cell in green
+                    elif current_cell.value == 2:
+                        temp = pygame.Surface((self.cell_width, self.cell_height), pygame.SRCALPHA)
+                        temp.convert_alpha()
+                        temp.fill((0,255,0,128))
+
+                        grid_surface.blit(temp, (y*self.cell_width, x*self.cell_height))
+
+                    #highlight path in blue
+                    elif current_cell.value == 3:
+                        temp = pygame.Surface((self.cell_width, self.cell_height), pygame.SRCALPHA)
+                        temp.convert_alpha()
+                        temp.fill((0,0,255,128))
 
                         grid_surface.blit(temp, (y*self.cell_width, x*self.cell_height))
 
@@ -202,11 +219,22 @@ class Grid(pygame.sprite.Sprite):
 
         return result
 
+    def get_cell_at_grid_index(self, index):
+        row = index[0]
+        col = index[1]
+        return self.grid_data[row][col]
+
     def toggle_lines(self):
         self.show_lines = not self.show_lines
         self.is_up_to_date = False
 
     def toggle_cells(self):
+        self.show_cells = not self.show_cells
+        self.is_up_to_date = False
+
+    def toggle_grid(self):
+        self.show_lines = self.show_cells
+        self.show_lines = not self.show_lines
         self.show_cells = not self.show_cells
         self.is_up_to_date = False
 
@@ -221,10 +249,13 @@ class Cell():
     def __init__(self, value, rect, row, col):
         self.value = value
         self.last_value = self.value
+        self.rect = rect
         self.row = row
         self.col = col
-        self.rect = rect
         self.position = (row, col)
 
     def __repr__(self):
-        return "<Cell> Row: {}  Col: {}  Value: {}".format(self.row, self.col, self.value)
+        return "<Cell>\nValue: {}\nLast Value: {}".format(self.value, self.last_value)
+
+    def is_passable(self):
+        return self.value == 0

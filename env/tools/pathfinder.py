@@ -17,7 +17,7 @@ def a_star_search(graph, start, goal):
     cost_so_far = {}
 
     came_from[start] = None
-    cost_so_far[start] = None
+    cost_so_far[start] = 0
 
     while not frontier.empty():
         current = frontier.get()
@@ -34,6 +34,15 @@ def a_star_search(graph, start, goal):
                 came_from[next] = current
         
     return came_from, cost_so_far
+
+def reconstruct_path(came_from, start, goal):
+    current = goal
+    path = [current]
+    while current != start:
+        current = came_from[current]
+        path.append(current)
+    path.reverse()
+    return path
     
 
 class WeightedGraph:
@@ -57,9 +66,7 @@ class WeightedGraph:
         weights = {}
         for row in range(len(self.data)):
             for col in range(len(self.data[row])):
-                value = self.data[row][col].value
-                if value != 0:
-                    weights[(row,col)] = self.data[row][col].value
+                weights[(row,col)] = self.data[row][col].value
 
         return weights
 

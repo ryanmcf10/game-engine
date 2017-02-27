@@ -21,6 +21,8 @@ class Overworld(environmentabc.Environment):
 
         if self.debug:
             self._show_grid()
+            self.goal = self.grid.get_cell_at_point(self.player.collision_rect.midbottom).position
+            self.grid.set_cell_value(self.grid.get_cell_at_grid_index(self.goal), 2)
 
     def update(self, surface, actions):
         position = self.player.position

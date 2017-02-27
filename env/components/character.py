@@ -195,6 +195,9 @@ class OverworldCharacter(pygame.sprite.Sprite):
 
         self.image = temp
 
+    def is_out_of_bounds(self, max_x, max_y):
+        return self.rect.top < 0 or self.rect.left < 0 or self.rect.bottom > max_y or self.rect.right > max_x
+        
     #check if the character is colliding with any rects in the blockers list
     def is_collision(self, blockers):
         assert type(blockers) is list, "Blockers must be a list of pygame.Rect objects"

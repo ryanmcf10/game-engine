@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" nextobjectid="40">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" nextobjectid="41">
  <tileset firstgid="1" name="grass-tiles-2-small" tilewidth="32" tileheight="32" tilecount="72" columns="12">
   <image source="tilesets/grass-tiles-2-small.png" width="384" height="192"/>
  </tileset>
@@ -117,20 +117,11 @@
   <object id="9" name="blocker" type="blocker" x="543.75" y="224.25" width="93.75" height="31.5"/>
   <object id="10" name="blocker" type="blocker" x="576.25" y="192" width="61" height="32"/>
   <object id="11" name="blocker" type="blocker" x="608" y="160" width="29.25" height="31.5"/>
-  <object id="15" name="blocker" type="blocker" x="0" y="1" width="638"/>
-  <object id="16" name="blocker" type="blocker" x="639" y="1" height="638"/>
-  <object id="17" name="blocker" type="blocker" x="0" y="639" width="638"/>
-  <object id="18" name="blocker" type="blocker" x="1" y="0" height="638"/>
  </objectgroup>
  <objectgroup name="Portals"/>
  <objectgroup name="Signs">
   <object id="26" name="sign" type="I'm a tree." x="385" y="449" width="128" height="64"/>
   <object id="29" name="sign" type="We're some mushrooms." x="191" y="384" width="33" height="64"/>
   <object id="30" name="sign" type="We're some mushrooms." x="256" y="383" height="32"/>
- </objectgroup>
- <objectgroup name="Character Spawns">
-  <object id="34" name="npc" type="0001" x="16" y="548" width="22" height="21"/>
-  <object id="35" name="npc" type="0002" x="251" y="192" width="30" height="30"/>
-  <object id="37" name="player" type="player" x="604" y="313" width="31" height="32"/>
  </objectgroup>
 </map>

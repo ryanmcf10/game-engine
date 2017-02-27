@@ -16,7 +16,7 @@ class Map():
         self.map_data = map_data
 
         #surface containg grid outline for the map
-        self.grid = grid.Grid(width, height, num_cols*2, num_rows*2)
+        self.grid = grid.Grid(width, height, num_cols, num_rows)
 
         self._build_blockers()
 
