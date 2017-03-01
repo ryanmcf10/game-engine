@@ -2,7 +2,7 @@ from env import environmentabc as environmentabc
 import env.tools.camera as camera
 import env.tools.maploader as maploader
 import env.tools.actionhandler2 as actionhandler
-import env.components.character as character
+import character2 as character
 import env.components.npc as npc
 from env.tools.grid import *
 
@@ -41,9 +41,9 @@ class Overworld(environmentabc.Environment):
                      RIGHT:[16, 17, 18, 16, 21, 22],
                      LEFT:[24, 25, 26, 24, 29, 30]}
 
-        self.player = character.OverworldCharacter('./tests/characters/sprites/male_sprite_model.png', position=[300,150],
+        self.player = character.AnimatedOverworldCharacter('./tests/characters/sprites/male_sprite_model.png', position=[300,150],
                                                     num_rows=4, num_cols=8, default_image=10, animation_dictionary=anim_dict,
-                                                    display_time=100, debug=self.debug)
+                                                    display_time=100, debug=True)
 
         self.view.add(self.player)
         self.handler = actionhandler.PlayerActionHandler(self.player, self.map.grid)

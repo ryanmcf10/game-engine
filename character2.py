@@ -211,7 +211,7 @@ class AnimatedOverworldCharacter(OverworldCharacter):
     """
     Set the current_frame to the image that should be drawn on next update
     """
-    def _update_current_frame(self):
+    def update(self):
         if self.current_animation:
             self.current_frame = self.animations[self.current_animation].getCurrentFrame()
         else:

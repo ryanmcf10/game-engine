@@ -2,6 +2,8 @@ import pygame, sys
 import eventparser as ep
 import env.overworld as overworld
 
+import pyconsole
+
 from colors import *
 
 from pygame.locals import *
@@ -14,13 +16,17 @@ def main():
     pygame.display.set_caption("PATH TEST")
     
     environment = overworld.Overworld('tests/maps/test.tmx', debug=True) 
-    
+
+    console = pyconsole.Console(DISPLAYSURF, (0,0,400,100))
 
     actions = []
 
     while True:
         mouse_pos = list(pygame.mouse.get_pos())
         environment.debug_update(DISPLAYSURF, actions, mouse_pos)
+
+        console.process_input()
+        console.draw()
 
         pygame.display.flip()
 

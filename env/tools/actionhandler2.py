@@ -62,10 +62,8 @@ class PlayerActionHandler(object):
             self.grid.set_cell_value(updated_cell, 2)
 
     def _move(self, directions, mod, blockers):
-        self.character.move(directions, mod)
+        self.character.move(directions, is_running=mod)
 
-        if self.character.is_collision(blockers) or self.character.is_out_of_bounds(self.grid.width, self.grid.height):
-            self.character.move_back()
 
     def move_to(self, goal):
         start = self.grid.get_cell_at_point(self.character.collision_rect.center).position
