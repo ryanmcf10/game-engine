@@ -238,6 +238,9 @@ class Grid(pygame.sprite.Sprite):
         self.show_cells = not self.show_cells
         self.is_up_to_date = False
 
+    def get_neighbors(self, cell):
+        pass
+        
 """
 CELL
 
